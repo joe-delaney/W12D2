@@ -570,7 +570,21 @@ exports.default = function (_ref) {
   var currentUser = _ref.currentUser,
       logout = _ref.logout;
 
-  var display = _react2.default.createElement(
+  var display = currentUser ? _react2.default.createElement(
+    'div',
+    null,
+    _react2.default.createElement(
+      'p',
+      null,
+      'Hello, ',
+      currentUser.username
+    ),
+    _react2.default.createElement(
+      'button',
+      { onClick: logout },
+      'Log out'
+    )
+  ) : _react2.default.createElement(
     'div',
     null,
     _react2.default.createElement(
@@ -627,24 +641,29 @@ var _nav_bar = __webpack_require__(/*! ./nav_bar */ "./frontend/components/nav_b
 
 var _nav_bar2 = _interopRequireDefault(_nav_bar);
 
+var _session = __webpack_require__(/*! ../../actions/session */ "./frontend/actions/session.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    currentUser: state.session.currentUser
+  };
+};
 
 // Comment this back in after you have built the login functionality
 
-// import { logout } from '../../actions/session';
-
-// const mapStateToProps = state => ({
-//   currentUser: state.session.currentUser,
-// });
-
-// const mapDispatchToProps = dispatch => ({
-//   logout: () => dispatch(logout()),
-// });
-
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return {
+    logout: function logout() {
+      return dispatch((0, _session.logout)());
+    }
+  };
+};
 
 // Comment this out when you have built the login functionality
-var mapStateToProps = null;
-var mapDispatchToProps = null;
+// const mapStateToProps = null;
+// const mapDispatchToProps = null;
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_nav_bar2.default);
 
@@ -1188,7 +1207,7 @@ var postUser = exports.postUser = function postUser(user) {
 };
 
 var postSession = exports.postSession = function postSession(user) {
-    $.ajax({
+    return $.ajax({
         method: "POST",
         url: '/api/session',
         data: { user: user }
@@ -1196,8 +1215,8 @@ var postSession = exports.postSession = function postSession(user) {
 };
 
 var deleteSession = exports.deleteSession = function deleteSession() {
-    $.ajax({
-        method: "DELETE",
+    return $.ajax({
+        method: 'DELETE',
         url: '/api/session'
     });
 };

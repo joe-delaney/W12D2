@@ -9,7 +9,7 @@ export const receiveCurrentUser = (user) => ({
 });
 
 export const logoutCurrentUser = () => ({
-    type: LOGOUT_CURRENT_USER
+    type: LOGOUT_CURRENT_USER,
 })
 
 export const createNewUser = (formUser) => (dispatch) => sessionUtil.postUser(formUser)
