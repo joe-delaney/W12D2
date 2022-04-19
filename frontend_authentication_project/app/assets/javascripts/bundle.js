@@ -146,6 +146,69 @@ var unLikeChirp = exports.unLikeChirp = function unLikeChirp(id) {
 
 /***/ }),
 
+/***/ "./frontend/actions/session.js":
+/*!*************************************!*\
+  !*** ./frontend/actions/session.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.logout = exports.login = exports.createNewUser = exports.logoutCurrentUser = exports.receiveCurrentUser = exports.LOGOUT_CURRENT_USER = exports.RECEIVE_CURRENT_USER = undefined;
+
+var _session = __webpack_require__(/*! ../utils/session */ "./frontend/utils/session.js");
+
+var sessionUtil = _interopRequireWildcard(_session);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var RECEIVE_CURRENT_USER = exports.RECEIVE_CURRENT_USER = "RECEIVE_CURRENT_USER";
+var LOGOUT_CURRENT_USER = exports.LOGOUT_CURRENT_USER = "LOGOUT_CURRENT_USER";
+
+var receiveCurrentUser = exports.receiveCurrentUser = function receiveCurrentUser(user) {
+    return {
+        type: RECEIVE_CURRENT_USER,
+        user: user
+    };
+};
+
+var logoutCurrentUser = exports.logoutCurrentUser = function logoutCurrentUser() {
+    return {
+        type: LOGOUT_CURRENT_USER
+    };
+};
+
+var createNewUser = exports.createNewUser = function createNewUser(formUser) {
+    return function (dispatch) {
+        return sessionUtil.postUser(formUser).then(function (user) {
+            return dispatch(receiveCurrentUser(user));
+        });
+    };
+};
+
+var login = exports.login = function login(formUser) {
+    return function (dispatch) {
+        return sessionUtil.postSession(formUser).then(function (user) {
+            return dispatch(receiveCurrentUser(user));
+        });
+    };
+};
+
+var logout = exports.logout = function logout() {
+    return function (dispatch) {
+        return sessionUtil.deleteSession().then(function () {
+            return dispatch(logoutCurrentUser());
+        });
+    };
+};
+
+/***/ }),
+
 /***/ "./frontend/bluebird.jsx":
 /*!*******************************!*\
   !*** ./frontend/bluebird.jsx ***!
@@ -790,11 +853,56 @@ var _entities = __webpack_require__(/*! ./entities */ "./frontend/reducers/entit
 
 var _entities2 = _interopRequireDefault(_entities);
 
+var _session = __webpack_require__(/*! ./session */ "./frontend/reducers/session.js");
+
+var _session2 = _interopRequireDefault(_session);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = (0, _redux.combineReducers)({
-  entities: _entities2.default
+  entities: _entities2.default,
+  session: _session2.default
 });
+
+/***/ }),
+
+/***/ "./frontend/reducers/session.js":
+/*!**************************************!*\
+  !*** ./frontend/reducers/session.js ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _session = __webpack_require__(/*! ../actions/session */ "./frontend/actions/session.js");
+
+var _nullSession = {
+    currentUser: null
+};
+
+var sessionReducer = function sessionReducer() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _nullSession;
+    var action = arguments[1];
+
+    Object.freeze(state);
+
+    switch (action.type) {
+        case _session.RECEIVE_CURRENT_USER:
+            return Object.assign({}, { currentUser: action.user });
+        case _session.LOGOUT_CURRENT_USER:
+            return _nullSession;
+        default:
+            return state;
+    }
+};
+
+exports.default = sessionReducer;
 
 /***/ }),
 
@@ -900,6 +1008,44 @@ var deleteLikeFromChirp = exports.deleteLikeFromChirp = function deleteLikeFromC
     method: 'DELETE',
     data: { id: id }
   });
+};
+
+/***/ }),
+
+/***/ "./frontend/utils/session.js":
+/*!***********************************!*\
+  !*** ./frontend/utils/session.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var postUser = exports.postUser = function postUser(user) {
+    return $.ajax({
+        method: 'POST',
+        url: '/api/users',
+        data: { user: user }
+    });
+};
+
+var postSession = exports.postSession = function postSession(user) {
+    $.ajax({
+        method: "POST",
+        url: '/api/session',
+        data: { user: user }
+    });
+};
+
+var deleteSession = exports.deleteSession = function deleteSession() {
+    $.ajax({
+        method: "DELETE",
+        url: '/api/session'
+    });
 };
 
 /***/ }),
