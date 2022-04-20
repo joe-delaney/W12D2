@@ -18,4 +18,18 @@ class ApplicationController < ActionController::Base
     session[:session_token] = nil
     current_user = nil
   end
+
+  def redirect_if_logged_in
+    redirect_to root_url if logged_in?
+  end
+
+  def redirect_if_not_logged_in
+    redirect_to new_session_url unless logged_in?
+  end
+
+  def deny_access_if_not_logged_in
+    unless logged_in?
+      render json: ['You must be logged in to do that'], status: :unauthorized
+    end
+  end
 end
